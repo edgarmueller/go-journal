@@ -1,0 +1,90 @@
+package templates
+
+import (
+	"fmt"
+	"github.com/edgarmueller/go-api-journal/internal/domain"
+	"time"
+)
+
+templ Journal(journalEntries []domain.JournalEntry) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<title>Go Journal</title>
+			<!-- Tailwind CSS -->
+			<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+			<script src="https://unpkg.com/htmx.org@1.9.2"></script>
+			<style>
+        .fade-in {
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        .fade-in.show {
+            opacity: 1;
+        }
+				</style>
+		</head>
+		<body id="body">
+			<div class="max-w-6xl mx-auto p-5 bg-white">
+				<div id="notification" class="fade-in hidden bg-green-500 text-white font-bold px-4 py-3 rounded relative mt-2">
+				Journal updated
+				</div>
+				<div class="flex justify-end mb-4">
+					<button
+						hx-post="logout"
+						hx-target="body"
+						hx-swap="innerHTML"
+						class="bg-black text-white font-semibold py-2 px-4 rounded hover:bg-gray-800 transition duration-300"
+					>
+						Logout
+					</button>
+				</div>
+				<h1 class="text-2xl font-bold mb-5 text-center text-black">My Journal</h1>
+				<form
+					action="journal"
+					hx-post="journal"
+					hx-include="find input"
+					hx-target="#body"
+					hx-swap="innerHTML"
+					class="space-y-4"
+				>
+					@Entry(&domain.JournalEntry{
+						Date:  time.Now(),
+					}, true)
+				</form>
+				<!-- Journal Entries Section -->
+				<div class="mt-5">
+					<!-- Assuming journalEntries are rendered here -->
+					for _, entry := range journalEntries {
+						<form
+							action="journal"
+							hx-put="journal"
+							hx-include="find input"
+							hx-target={ fmt.Sprintf("#entry-%d", entry.ID) }
+							hx-swap="outerHTML"
+							class="w-full mx-auto bg-white entry-form"
+						>
+							@Entry(&entry, false)
+						</form>
+					}
+				</div>
+			</div>
+			<script>
+	        document.body.addEventListener('htmx:afterSwap', function (event) {
+            if (event.detail.target.id.includes('entry-')) {
+								console.log("Event: ", event);
+                const notification = document.getElementById('notification');
+                notification.classList.remove('hidden');
+                notification.classList.add('show');
+                setTimeout(function() {
+                    notification.classList.remove('show');
+                    notification.classList.add('hidden');
+                }, 3000);
+            }
+        });
+    </script>
+		</body>
+	</html>
+}

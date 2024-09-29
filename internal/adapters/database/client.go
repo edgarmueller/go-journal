@@ -22,6 +22,6 @@ func Connect(connectionString string) (db *gorm.DB) {
 }
 
 func Migrate() {
-	Instance.AutoMigrate(domain.User{})
+	Instance.AutoMigrate(domain.User{}, domain.WorkJournal{}, domain.JournalEntry{})
 	log.Println("Database migrated completed")
 }

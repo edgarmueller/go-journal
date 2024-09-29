@@ -10,18 +10,18 @@ type TokenRequest struct {
 	Password string `json:"password"`
 }
 
-func NewTokenController(router *gin.RouterGroup, auth *usecases.AuthUseCases) {
-	controller := &TokenController{
+func NewTokenAPIController(router *gin.RouterGroup, auth *usecases.AuthUseCases) {
+	controller := &TokenAPIController{
 		auth: auth,
 	}
 	router.POST("/token", controller.GenerateToken)
 }
 
-type TokenController struct {
+type TokenAPIController struct {
 	auth *usecases.AuthUseCases
 }
 
-func (t *TokenController) GenerateToken(ctx *gin.Context) {
+func (t *TokenAPIController) GenerateToken(ctx *gin.Context) {
 	var request TokenRequest
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {

@@ -1,0 +1,47 @@
+package templates
+
+import (
+	"fmt"
+	"github.com/edgarmueller/go-api-journal/internal/domain"
+	"strings"
+)
+
+templ Entry(journalEntry *domain.JournalEntry, editableDate bool) {
+	<div id={ fmt.Sprintf("entry-%d", journalEntry.ID) } class="flex flex-col space-y-4">
+		<div class="flex items-center space-x-4">
+			<input
+				name="date"
+				value={ journalEntry.Date.Format("2006-01-02") }
+				type="date"
+				class="mt-1 block p-2 border border-gray-400 rounded-md focus:ring-0 focus:border-black"
+				required
+				if !editableDate {
+					readonly="true"
+				}
+			/>
+			<div class="flex-1">
+				<input
+					name="tasks"
+					value={ strings.Join(journalEntry.Tasks, ",") }
+					contenteditable="true"
+					required
+					class="mt-1 block w-full p-2 border border-gray-400 rounded-md focus:ring-0 focus:border-black"
+					placeholder="Enter tasks separated by commas"
+				/>
+			</div>
+			<input
+				name="workingHours"
+				type="number"
+				value={ fmt.Sprintf("%.2f", journalEntry.WorkingHours) }
+				contenteditable="true"
+				required
+			  step="0.25"
+				class="mt-1 block p-2 border border-gray-400 rounded-md focus:ring-0 focus:border-black"
+				placeholder="Enter working hours"
+			/>
+			<button type="submit" hidden class="bg-black text-white font-semibold py-2 px-4 rounded hover:bg-gray-800 transition duration-300">
+				Submit Entry
+			</button>
+		</div>
+	</div>
+}
